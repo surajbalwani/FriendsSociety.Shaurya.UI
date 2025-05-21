@@ -1,0 +1,19 @@
+<h2>Roles</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Role ID</th>
+      <th>Name</th>
+      <!-- Add more columns as needed -->
+    </tr>
+  </thead>
+  <tbody>
+    @for (role of roles; track role.roleID) {
+      <tr>
+        <td>{{ role.roleID }}</td>
+        <td>{{ role.name }}</td>
+        <!-- Add more cells as needed -->
+      </tr>
+    }
+  </tbody>
+</table>

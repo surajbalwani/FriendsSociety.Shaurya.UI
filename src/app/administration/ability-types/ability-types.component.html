@@ -1,0 +1,21 @@
+<h2>Ability Types</h2>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (ability of abilities; track ability.abilityTypeID) {
+      <tr>
+        <td>{{ ability.abilityTypeID }}</td>
+        <td>{{ ability.name }}</td>
+        <td>{{ ability.description }}</td>
+        <td>{{ ability.isDeleted ? 'Deleted' : 'Active' }}</td>
+      </tr>
+    }
+  </tbody>
+</table>

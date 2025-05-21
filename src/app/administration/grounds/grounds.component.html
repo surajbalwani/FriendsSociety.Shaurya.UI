@@ -1,0 +1,19 @@
+<h2>Grounds</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Ground ID</th>
+      <th>Name</th>
+      <th>Location</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (ground of grounds; track ground.groundID) {
+      <tr>
+        <td>{{ ground.groundID }}</td>
+        <td>{{ ground.name }}</td>
+        <td>{{ ground.location }}</td>
+      </tr>
+    }
+  </tbody>
+</table>

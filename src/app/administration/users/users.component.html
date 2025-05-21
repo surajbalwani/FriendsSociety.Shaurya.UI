@@ -1,0 +1,29 @@
+<h2>Users</h2>
+<table>
+  <thead>
+    <tr>
+      <th>User ID</th>
+      <th>Name</th>
+      <th>Age</th>
+      <th>Contact</th>
+      <th>Role ID</th>
+      <th>Ability Type ID</th>
+      <th>Organization ID</th>
+      <th>Is Deleted</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (user of users; track user.userID) {
+      <tr>
+        <td>{{ user.userID }}</td>
+        <td>{{ user.name }}</td>
+        <td>{{ user.age }}</td>
+        <td>{{ user.contact }}</td>
+        <td>{{ user.roleID }}</td>
+        <td>{{ user.abilityTypeID }}</td>
+        <td>{{ user.organizationID }}</td>
+        <td>{{ user.isDeleted }}</td>
+      </tr>
+    }
+  </tbody>
+</table>

@@ -1,0 +1,21 @@
+<h2>Activities</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Activity ID</th>
+      <th>Name</th>
+      <th>Rules</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (activity of activities; track activity.activityID) {
+      <tr>
+        <td>{{ activity.activityID }}</td>
+        <td>{{ activity.name }}</td>
+        <td>{{ activity.rules }}</td>
+        <td>{{ activity.isDeleted ? 'Deleted' : 'Active' }}</td>
+      </tr>
+    }
+  </tbody>
+</table>
