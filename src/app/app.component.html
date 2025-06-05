@@ -1,12 +1,32 @@
 <nav>
-  <div class="nav-container">
-    <ul style="display: flex; gap: 0; list-style: none; padding: 0; margin: 0;">
-      <li><a routerLink="/home" routerLinkActive="active" style="border-right: 1px solid #ede9fe;">Home</a></li>
-      <li><a routerLink="/members" routerLinkActive="active" style="border-right: 1px solid #ede9fe;">Members</a></li>
-      <li><a routerLink="/events" routerLinkActive="active" style="border-right: 1px solid #ede9fe;">Events</a></li>
-      <li><a routerLink="/contact" routerLinkActive="active" style="border-right: 1px solid #ede9fe;">Contact</a></li>
-      <li><a routerLink="/administration" routerLinkActive="active">Administration</a></li>
-    </ul>
+  <div class="nav-wrapper">
+    <div class="brand">
+      <div class="brand-main">Shaurya</div>
+    </div>
+    <div class="nav-container">
+      <ul>
+        <li><a routerLink="/home" routerLinkActive="active">
+          <span>Home</span>
+          <mat-icon>home</mat-icon>
+        </a></li>
+        <li><a routerLink="/members" routerLinkActive="active">
+          <span>Members</span>
+          <mat-icon>people</mat-icon>
+        </a></li>
+        <li><a routerLink="/events" routerLinkActive="active">
+          <span>Events</span>
+          <mat-icon>event</mat-icon>
+        </a></li>
+        <li><a routerLink="/contact" routerLinkActive="active">
+          <span>Contact</span>
+          <mat-icon>mail</mat-icon>
+        </a></li>
+        <li><a routerLink="/administration" routerLinkActive="active">
+          <span>Administration</span>
+          <mat-icon>settings</mat-icon>
+        </a></li>
+      </ul>
+    </div>
   </div>
 </nav>
 <router-outlet></router-outlet>

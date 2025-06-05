@@ -35,6 +35,10 @@ export const routes: Routes = [
         path: 'ability-types',
         loadComponent: () => import('./administration/ability-types/ability-types.component').then(m => m.AbilityTypesComponent)
       },
+      {
+        path: 'organization',
+        loadComponent: () => import('./administration/organization/organization.component').then(m => m.OrganizationComponent)
+      },
       { path: '', redirectTo: 'users', pathMatch: 'full' }
     ]
   }

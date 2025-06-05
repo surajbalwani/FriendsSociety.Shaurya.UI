@@ -1,0 +1,25 @@
+<div class="module-container">
+    <div class="table-container">
+        <div class="container">
+            <h2>Organizations</h2>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Organization ID</th>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (organization of organizations; track organization.organizationID) {
+                        <tr>
+                            <td>{{ organization.organizationID }}</td>
+                            <td>{{ organization.name }}</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

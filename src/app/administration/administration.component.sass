@@ -1,47 +1,38 @@
 .admin-layout
   display: flex
-  min-height: 100vh
-  position: relative
-  top: 0
+  height: calc(100vh - 52px) // subtract top nav height
 
-.admin-menu
-  width: 220px
-  background: #7c3aed
-  padding: 0
-  display: flex
-  flex-direction: column
-  justify-content: flex-start
-  align-items: stretch
-  box-shadow: 2px 0 8px rgba(124, 58, 237, 0.08)
-  border-top: 4px solid #fff // Distinction from top bar
+  .admin-menu
+    width: 240px
+    background: white
+    border-right: 1px solid #e5e7eb
+    
+    ul
+      list-style: none
+      margin: 0
+      padding: 16px 0
 
-  ul
-    list-style: none
-    margin: 0
-    padding: 0
+      li
+        a
+          display: block
+          padding: 12px 24px
+          color: #4b5563
+          text-decoration: none
+          font-weight: 500
+          border-left: 2px solid transparent
+          transition: all 0.2s ease
 
-  li
-    margin: 0
+          &:hover
+            color: #7c3aed
+            background: #faf8ff
 
-  a
-    color: #fff
-    text-decoration: none
-    font-weight: 600
-    padding: 1rem 1.5rem
-    border-radius: 0
-    display: block
-    letter-spacing: 0.03em
-    font-size: 1rem
-    border-left: 4px solid transparent
-    transition: background 0.18s, color 0.18s, border-color 0.18s
+          &.active
+            color: #7c3aed
+            background: #f5f3ff
+            border-left-color: #7c3aed
 
-  a.active, a:hover, a:focus
-    background: #fff
-    color: #7c3aed
-    border-left: 4px solid #7c3aed
-    outline: none
-
-.admin-content
-  flex: 1
-  padding: 2rem
-  background: #f5f3ff
+  .admin-content
+    flex: 1
+    padding: 24px
+    background: #f9fafb
+    overflow-y: auto
