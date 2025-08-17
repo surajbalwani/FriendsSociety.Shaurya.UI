@@ -1,4 +1,75 @@
 <h2>Grounds</h2>
+
+<!-- Toggle Form Button - Right aligned -->
+<div style="margin-bottom: 20px; text-align: right;">
+  <button 
+    type="button" 
+    style="background-color: #7c3aed; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;"
+    (click)="toggleForm()"
+    [disabled]="isSubmitting">
+    {{ showForm ? 'Hide Form' : 'Add New Ground' }}
+  </button>
+</div>
+
+<!-- Add New Ground Form -->
+<div *ngIf="showForm" style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 4px; background-color: #f9f9f9;">
+  <h3>Add New Ground</h3>
+  <form [formGroup]="groundForm" (ngSubmit)="onSubmit()">
+    <div style="margin-bottom: 15px;">
+      <label for="name" style="display: block; margin-bottom: 5px; font-weight: bold;">Name *</label>
+      <input 
+        type="text" 
+        id="name" 
+        formControlName="name" 
+        style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"
+        placeholder="Enter ground name">
+      <div *ngIf="groundForm.get('name')?.invalid && groundForm.get('name')?.touched" style="color: red; font-size: 12px; margin-top: 5px;">
+        <span *ngIf="groundForm.get('name')?.errors?.['required']">Name is required</span>
+        <span *ngIf="groundForm.get('name')?.errors?.['minlength']">Name must be at least 2 characters</span>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <label for="location" style="display: block; margin-bottom: 5px; font-weight: bold;">Location *</label>
+      <input 
+        type="text" 
+        id="location" 
+        formControlName="location" 
+        style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"
+        placeholder="Enter ground location">
+      <div *ngIf="groundForm.get('location')?.invalid && groundForm.get('location')?.touched" style="color: red; font-size: 12px; margin-top: 5px;">
+        <span *ngIf="groundForm.get('location')?.errors?.['required']">Location is required</span>
+        <span *ngIf="groundForm.get('location')?.errors?.['minlength']">Location must be at least 5 characters</span>
+      </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <button 
+        type="submit" 
+        style="background-color: #7c3aed; color: white; padding: 8px 16px; border: none; border-radius: 4px; margin-right: 10px; cursor: pointer;"
+        [disabled]="groundForm.invalid || isSubmitting">
+        {{ isSubmitting ? 'Creating...' : 'Create Ground' }}
+      </button>
+      <button 
+        type="button" 
+        style="background-color: #6c757d; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;"
+        (click)="toggleForm()"
+        [disabled]="isSubmitting">
+        Cancel
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Success/Error Messages -->
+<div *ngIf="message" style="padding: 10px; margin-bottom: 15px; border-radius: 4px;" 
+     [style.background-color]="messageType === 'success' ? '#d4edda' : '#f8d7da'"
+     [style.color]="messageType === 'success' ? '#155724' : '#721c24'"
+     [style.border]="messageType === 'success' ? '1px solid #c3e6cb' : '1px solid #f5c6cb'">
+  {{ message }}
+</div>
+
+<!-- Grounds Table -->
 <table>
   <thead>
     <tr>
@@ -8,12 +79,10 @@
     </tr>
   </thead>
   <tbody>
-    @for (ground of grounds; track ground.groundID) {
-      <tr>
-        <td>{{ ground.groundID }}</td>
-        <td>{{ ground.name }}</td>
-        <td>{{ ground.location }}</td>
-      </tr>
-    }
+    <tr *ngFor="let ground of grounds; trackBy: trackByGroundID">
+      <td>{{ ground.groundID }}</td>
+      <td>{{ ground.name }}</td>
+      <td>{{ ground.location }}</td>
+    </tr>
   </tbody>
 </table>

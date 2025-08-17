@@ -2,24 +2,90 @@
     <div class="table-container">
         <div class="container">
             <h2>Organizations</h2>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Organization ID</th>
-                            <th>Name</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (organization of organizations; track organization.organizationID) {
-                        <tr>
-                            <td>{{ organization.organizationID }}</td>
-                            <td>{{ organization.name }}</td>
-                        </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+
+<!-- Toggle Form Button - Right aligned -->
+<div style="margin-bottom: 20px; text-align: right;">
+  <button 
+    type="button" 
+    style="background-color: #7c3aed; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;"
+    (click)="toggleForm()"
+    [disabled]="isSubmitting">
+    {{ showForm ? 'Hide Form' : 'Add New Organization' }}
+  </button>
 </div>
+
+<!-- Add New Organization Form -->
+<div *ngIf="showForm" style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 4px; background-color: #f9f9f9;">
+  <h3>Add New Organization</h3>
+  <form [formGroup]="organizationForm" (ngSubmit)="onSubmit()">
+    <div style="margin-bottom: 15px;">
+      <label for="name" style="display: block; margin-bottom: 5px; font-weight: bold;">Name *</label>
+      <input 
+        type="text" 
+        id="name" 
+        formControlName="name" 
+        style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"
+        placeholder="Enter organization name">
+      <div *ngIf="organizationForm.get('name')?.invalid && organizationForm.get('name')?.touched" style="color: red; font-size: 12px; margin-top: 5px;">
+        <span *ngIf="organizationForm.get('name')?.errors?.['required']">Name is required</span>
+        <span *ngIf="organizationForm.get('name')?.errors?.['minlength']">Name must be at least 2 characters</span>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <label for="contact" style="display: block; margin-bottom: 5px; font-weight: bold;">Contact *</label>
+      <textarea 
+        id="contact" 
+        formControlName="contact" 
+        style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"
+        rows="3"
+        placeholder="Enter organization contact information"></textarea>
+      <div *ngIf="organizationForm.get('contact')?.invalid && organizationForm.get('contact')?.touched" style="color: red; font-size: 12px; margin-top: 5px;">
+        <span *ngIf="organizationForm.get('contact')?.errors?.['required']">Contact is required</span>
+        <span *ngIf="organizationForm.get('contact')?.errors?.['minlength']">Contact must be at least 5 characters</span>
+      </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <button 
+        type="submit" 
+        style="background-color: #7c3aed; color: white; padding: 8px 16px; border: none; border-radius: 4px; margin-right: 10px; cursor: pointer;"
+        [disabled]="organizationForm.invalid || isSubmitting">
+        {{ isSubmitting ? 'Creating...' : 'Create Organization' }}
+      </button>
+      <button 
+        type="button" 
+        style="background-color: #6c757d; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;"
+        (click)="toggleForm()"
+        [disabled]="isSubmitting">
+        Cancel
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Success/Error Messages -->
+<div *ngIf="message" style="padding: 10px; margin-bottom: 15px; border-radius: 4px;" 
+     [style.background-color]="messageType === 'success' ? '#d4edda' : '#f8d7da'"
+     [style.color]="messageType === 'success' ? '#155724' : '#721c24'"
+     [style.border]="messageType === 'success' ? '1px solid #c3e6cb' : '1px solid #f5c6cb'">
+  {{ message }}
+</div>
+
+<!-- Organizations Table -->
+<table>
+  <thead>
+    <tr>
+      <th>Organization ID</th>
+      <th>Name</th>
+      <th>Contact</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let organization of organizations; trackBy: trackByOrganizationID">
+      <td>{{ organization.organizationID }}</td>
+      <td>{{ organization.name }}</td>
+      <td>{{ organization.contact }}</td>
+    </tr>
+  </tbody>
+</table>
