@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ApiGenericService } from '../../services/api-generic.service';
+import { RoleService } from '../../services/role.service';
 import { Role } from '../../model/role.model';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-roles',
@@ -18,14 +17,13 @@ export class RolesComponent implements OnInit {
   isSubmitting = false;
   message = '';
   messageType: 'success' | 'error' = 'success';
-  private roleApiUrl = `${environment.apiBaseUrl}/Roles`;
 
   constructor(
-    private apiService: ApiGenericService<Role>,
-    private fb: FormBuilder
+    private roleService: RoleService,
+    private fb: FormBuilder,
   ) {
     this.roleForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2)]]
+      name: ['', [Validators.required, Validators.minLength(2)]],
     });
   }
 
@@ -34,15 +32,14 @@ export class RolesComponent implements OnInit {
   }
 
   loadRoles(): void {
-    this.apiService.setApiUrl(this.roleApiUrl);
-    this.apiService.getAll().subscribe({
+    this.roleService.getAll().subscribe({
       next: (data) => {
         this.roles = data;
       },
       error: (error) => {
         console.error('Error loading roles:', error);
         this.showMessage('Error loading roles', 'error');
-      }
+      },
     });
   }
 
@@ -58,10 +55,10 @@ export class RolesComponent implements OnInit {
     if (this.roleForm.valid) {
       this.isSubmitting = true;
       const newRole: Partial<Role> = {
-        name: this.roleForm.value.name
+        name: this.roleForm.value.name,
       };
 
-      this.apiService.add(newRole as Role).subscribe({
+      this.roleService.add(newRole as Role).subscribe({
         next: (createdRole) => {
           this.roles.push(createdRole);
           this.roleForm.reset();
@@ -74,7 +71,7 @@ export class RolesComponent implements OnInit {
         },
         complete: () => {
           this.isSubmitting = false;
-        }
+        },
       });
     }
   }

@@ -8,13 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './app.component.html',
   styleUrl: './app.component.sass',
   standalone: true,
-  imports: [
-    CommonModule, 
-    RouterOutlet, 
-    RouterLink, 
-    RouterLinkActive,
-    MatIconModule
-  ]
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, MatIconModule],
 })
 export class AppComponent {
   title = 'FriendsSociety.Sharya.UI';

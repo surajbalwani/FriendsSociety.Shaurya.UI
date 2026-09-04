@@ -1,15 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ApiGenericService } from '../../services/api-generic.service';
+import { GroundService } from '../../services/ground.service';
 import { Ground } from '../../model/ground.model';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-grounds',
   templateUrl: './grounds.component.html',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule]
+  imports: [CommonModule, ReactiveFormsModule],
 })
 export class GroundsComponent implements OnInit {
   grounds: Ground[] = [];
@@ -18,15 +17,14 @@ export class GroundsComponent implements OnInit {
   isSubmitting = false;
   message = '';
   messageType: 'success' | 'error' = 'success';
-  private groundsApiUrl = `${environment.apiBaseUrl}/Grounds`;
 
   constructor(
-    private apiService: ApiGenericService<Ground>,
-    private fb: FormBuilder
+    private groundService: GroundService,
+    private fb: FormBuilder,
   ) {
     this.groundForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
-      location: ['', [Validators.required, Validators.minLength(5)]]
+      location: ['', [Validators.required, Validators.minLength(5)]],
     });
   }
 
@@ -35,15 +33,14 @@ export class GroundsComponent implements OnInit {
   }
 
   loadGrounds(): void {
-    this.apiService.setApiUrl(this.groundsApiUrl);
-    this.apiService.getAll().subscribe({
+    this.groundService.getAll().subscribe({
       next: (data) => {
         this.grounds = data;
       },
       error: (error) => {
         console.error('Error loading grounds:', error);
         this.showMessage('Error loading grounds', 'error');
-      }
+      },
     });
   }
 
@@ -60,10 +57,10 @@ export class GroundsComponent implements OnInit {
       this.isSubmitting = true;
       const newGround: Partial<Ground> = {
         name: this.groundForm.value.name,
-        location: this.groundForm.value.location
+        location: this.groundForm.value.location,
       };
 
-      this.apiService.add(newGround as Ground).subscribe({
+      this.groundService.add(newGround as Ground).subscribe({
         next: (createdGround) => {
           this.grounds.push(createdGround);
           this.groundForm.reset();
@@ -76,7 +73,7 @@ export class GroundsComponent implements OnInit {
         },
         complete: () => {
           this.isSubmitting = false;
-        }
+        },
       });
     }
   }

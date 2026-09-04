@@ -1,15 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ApiGenericService } from '../../services/api-generic.service';
+import { ActivityService } from '../../services/activity.service';
 import { Activity } from '../../model/activity.model';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-activities',
   templateUrl: './activities.component.html',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule]
+  imports: [CommonModule, ReactiveFormsModule],
 })
 export class ActivitiesComponent implements OnInit {
   activities: Activity[] = [];
@@ -18,15 +17,14 @@ export class ActivitiesComponent implements OnInit {
   isSubmitting = false;
   message = '';
   messageType: 'success' | 'error' = 'success';
-  private activitiesApiUrl = `${environment.apiBaseUrl}/Activities`;
 
   constructor(
-    private apiService: ApiGenericService<Activity>,
-    private fb: FormBuilder
+    private activityService: ActivityService,
+    private fb: FormBuilder,
   ) {
     this.activityForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
-      rules: ['', [Validators.required, Validators.minLength(5)]]
+      rules: ['', [Validators.required, Validators.minLength(5)]],
     });
   }
 
@@ -35,15 +33,14 @@ export class ActivitiesComponent implements OnInit {
   }
 
   loadActivities(): void {
-    this.apiService.setApiUrl(this.activitiesApiUrl);
-    this.apiService.getAll().subscribe({
+    this.activityService.getAll().subscribe({
       next: (data) => {
         this.activities = data;
       },
       error: (error) => {
         console.error('Error loading activities:', error);
         this.showMessage('Error loading activities', 'error');
-      }
+      },
     });
   }
 
@@ -61,10 +58,10 @@ export class ActivitiesComponent implements OnInit {
       const newActivity: Partial<Activity> = {
         name: this.activityForm.value.name,
         rules: this.activityForm.value.rules,
-        isDeleted: false
+        isDeleted: false,
       };
 
-      this.apiService.add(newActivity as Activity).subscribe({
+      this.activityService.add(newActivity as Activity).subscribe({
         next: (createdActivity) => {
           this.activities.push(createdActivity);
           this.activityForm.reset();
@@ -77,7 +74,7 @@ export class ActivitiesComponent implements OnInit {
         },
         complete: () => {
           this.isSubmitting = false;
-        }
+        },
       });
     }
   }

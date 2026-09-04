@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ApiGenericService } from '../../services/api-generic.service';
+import { UserService } from '../../services/user.service';
 import { User } from '../../model/user.model';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-users',
@@ -18,11 +17,10 @@ export class UsersComponent implements OnInit {
   isSubmitting = false;
   message = '';
   messageType: 'success' | 'error' = 'success';
-  private userApiUrl = `${environment.apiBaseUrl}/Users`;
 
   constructor(
-    private apiService: ApiGenericService<User>,
-    private fb: FormBuilder
+    private userService: UserService,
+    private fb: FormBuilder,
   ) {
     this.userForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
@@ -30,7 +28,7 @@ export class UsersComponent implements OnInit {
       contact: ['', [Validators.required, Validators.minLength(10)]],
       roleID: ['', [Validators.required]],
       abilityTypeID: ['', [Validators.required]],
-      organizationID: ['', [Validators.required]]
+      organizationID: ['', [Validators.required]],
     });
   }
 
@@ -39,15 +37,14 @@ export class UsersComponent implements OnInit {
   }
 
   loadUsers(): void {
-    this.apiService.setApiUrl(this.userApiUrl);
-    this.apiService.getAll().subscribe({
+    this.userService.getAll().subscribe({
       next: (data) => {
         this.users = data;
       },
       error: (error) => {
         console.error('Error loading users:', error);
         this.showMessage('Error loading users', 'error');
-      }
+      },
     });
   }
 
@@ -69,10 +66,10 @@ export class UsersComponent implements OnInit {
         roleID: parseInt(this.userForm.value.roleID),
         abilityTypeID: parseInt(this.userForm.value.abilityTypeID),
         organizationID: parseInt(this.userForm.value.organizationID),
-        isDeleted: false
+        isDeleted: false,
       };
 
-      this.apiService.add(newUser as User).subscribe({
+      this.userService.add(newUser as User).subscribe({
         next: (createdUser) => {
           this.users.push(createdUser);
           this.userForm.reset();
@@ -85,7 +82,7 @@ export class UsersComponent implements OnInit {
         },
         complete: () => {
           this.isSubmitting = false;
-        }
+        },
       });
     }
   }

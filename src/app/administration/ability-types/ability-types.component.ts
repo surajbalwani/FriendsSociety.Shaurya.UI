@@ -1,15 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ApiGenericService } from '../../services/api-generic.service';
+import { AbilityTypeService } from '../../services/ability-type.service';
 import { AbilityType } from '../../model/ability-type.model';
-import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-ability-types',
   templateUrl: './ability-types.component.html',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule]
+  imports: [CommonModule, ReactiveFormsModule],
 })
 export class AbilityTypesComponent implements OnInit {
   abilities: AbilityType[] = [];
@@ -18,15 +17,14 @@ export class AbilityTypesComponent implements OnInit {
   isSubmitting = false;
   message = '';
   messageType: 'success' | 'error' = 'success';
-  private abilitiesApiUrl = `${environment.apiBaseUrl}/AbilityTypes`;
 
   constructor(
-    private apiService: ApiGenericService<AbilityType>,
-    private fb: FormBuilder
+    private abilityService: AbilityTypeService,
+    private fb: FormBuilder,
   ) {
     this.abilityForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
-      description: ['', [Validators.required, Validators.minLength(5)]]
+      description: ['', [Validators.required, Validators.minLength(5)]],
     });
   }
 
@@ -35,15 +33,14 @@ export class AbilityTypesComponent implements OnInit {
   }
 
   loadAbilities(): void {
-    this.apiService.setApiUrl(this.abilitiesApiUrl);
-    this.apiService.getAll().subscribe({
+    this.abilityService.getAll().subscribe({
       next: (data) => {
         this.abilities = data;
       },
       error: (error) => {
         console.error('Error loading abilities:', error);
         this.showMessage('Error loading ability types', 'error');
-      }
+      },
     });
   }
 
@@ -61,10 +58,10 @@ export class AbilityTypesComponent implements OnInit {
       const newAbility: Partial<AbilityType> = {
         name: this.abilityForm.value.name,
         description: this.abilityForm.value.description,
-        isDeleted: false
+        isDeleted: false,
       };
 
-      this.apiService.add(newAbility as AbilityType).subscribe({
+      this.abilityService.add(newAbility as AbilityType).subscribe({
         next: (createdAbility) => {
           this.abilities.push(createdAbility);
           this.abilityForm.reset();
@@ -77,7 +74,7 @@ export class AbilityTypesComponent implements OnInit {
         },
         complete: () => {
           this.isSubmitting = false;
-        }
+        },
       });
     }
   }
