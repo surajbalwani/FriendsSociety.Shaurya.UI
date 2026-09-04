@@ -1,0 +1,126 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>Shaurya Dashboard</h1>
+    <p class="subtitle">Activity Management System for Inclusive Sports</p>
+  </div>
+
+  <div *ngIf="loading" class="loading">Loading dashboard data...</div>
+
+  <div *ngIf="!loading">
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+      <div class="stat-card stat-users">
+        <div class="stat-icon">👥</div>
+        <div class="stat-content">
+          <h3>{{ stats.totalUsers }}</h3>
+          <p>Total Users</p>
+        </div>
+      </div>
+
+      <div class="stat-card stat-activities">
+        <div class="stat-icon">🏃</div>
+        <div class="stat-content">
+          <h3>{{ stats.totalActivities }}</h3>
+          <p>Activities</p>
+        </div>
+      </div>
+
+      <div class="stat-card stat-grounds">
+        <div class="stat-icon">🏟️</div>
+        <div class="stat-content">
+          <h3>{{ stats.totalGrounds }}</h3>
+          <p>Grounds</p>
+        </div>
+      </div>
+
+      <div class="stat-card stat-allocations">
+        <div class="stat-icon">📅</div>
+        <div class="stat-content">
+          <h3>{{ stats.upcomingAllocations }}</h3>
+          <p>Upcoming Events</p>
+        </div>
+      </div>
+
+      <div class="stat-card stat-organizations">
+        <div class="stat-icon">🏢</div>
+        <div class="stat-content">
+          <h3>{{ stats.totalOrganizations }}</h3>
+          <p>Organizations</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Allocations and User Distribution -->
+    <div class="info-grid">
+      <!-- Recent Allocations -->
+      <div class="info-card">
+        <h2>Recent Ground Allocations</h2>
+        <div class="allocation-list">
+          <div *ngFor="let allocation of recentAllocations" 
+               class="allocation-item"
+               [class.upcoming]="isUpcoming(allocation.startTime)">
+            <div class="allocation-info">
+              <strong>{{ allocation.activity?.name || 'Activity' }}</strong>
+              <span class="allocation-ground">{{ allocation.ground?.name || 'Ground' }}</span>
+            </div>
+            <div class="allocation-time">
+              <span class="time">{{ formatDateTime(allocation.startTime) }}</span>
+              <span class="status-badge" 
+                    [class.badge-upcoming]="isUpcoming(allocation.startTime)"
+                    [class.badge-past]="!isUpcoming(allocation.startTime)">
+                {{ isUpcoming(allocation.startTime) ? 'Upcoming' : 'Past' }}
+              </span>
+            </div>
+          </div>
+          <div *ngIf="recentAllocations.length === 0" class="no-data">
+            No allocations scheduled yet.
+          </div>
+        </div>
+      </div>
+
+      <!-- User Distribution by Ability Type -->
+      <div class="info-card">
+        <h2>Users by Ability Type</h2>
+        <div class="ability-list">
+          <div *ngFor="let ability of usersByAbilityType" class="ability-item">
+            <div class="ability-info">
+              <span class="ability-name">{{ ability.name }}</span>
+              <span class="ability-count">{{ ability.count }} users</span>
+            </div>
+            <div class="ability-bar">
+              <div class="ability-progress" 
+                   [style.width.%]="(ability.count / stats.totalUsers) * 100">
+              </div>
+            </div>
+          </div>
+          <div *ngIf="usersByAbilityType.length === 0" class="no-data">
+            No users registered yet.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <h2>Quick Actions</h2>
+      <div class="action-buttons">
+        <a routerLink="/users" class="action-btn">
+          <span class="action-icon">👤</span>
+          <span>Manage Users</span>
+        </a>
+        <a routerLink="/activities" class="action-btn">
+          <span class="action-icon">🎯</span>
+          <span>Manage Activities</span>
+        </a>
+        <a routerLink="/grounds" class="action-btn">
+          <span class="action-icon">🏟️</span>
+          <span>Manage Grounds</span>
+        </a>
+        <a routerLink="/ground-allocations" class="action-btn">
+          <span class="action-icon">📅</span>
+          <span>Schedule Events</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

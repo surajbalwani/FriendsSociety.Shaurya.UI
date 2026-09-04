@@ -1,0 +1,265 @@
+<div class="registration-container">
+  <div class="page-header">
+    <h1>🎓 Student Registration</h1>
+    <p>Register new students for activities</p>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="action-buttons" *ngIf="!showForm && !showBulkUpload">
+    <button class="btn btn-primary" (click)="openAddForm()">
+      <span class="btn-icon">➕</span>
+      Add New User
+    </button>
+    <button class="btn btn-success" (click)="openBulkUploadForm()">
+      <span class="btn-icon">📤</span>
+      Bulk Upload
+    </button>
+  </div>
+
+  <!-- Add New User Form -->
+  <div class="form-card" *ngIf="showForm">
+    <div class="form-header">
+      <h2>Register New User</h2>
+      <button class="close-btn" (click)="closeForm()">✕</button>
+    </div>
+
+    <form (ngSubmit)="saveParticipant()" #participantForm="ngForm">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="name">Name *</label>
+          <input 
+            type="text" 
+            id="name" 
+            name="name" 
+            [(ngModel)]="newParticipant.name" 
+            required
+            class="form-control"
+            placeholder="Enter name">
+        </div>
+
+        <div class="form-group">
+          <label for="age">Age *</label>
+          <input 
+            type="number" 
+            id="age" 
+            name="age" 
+            [(ngModel)]="newParticipant.age" 
+            required
+            min="1"
+            class="form-control"
+            placeholder="Enter age">
+        </div>
+
+
+
+        <div class="form-group">
+          <label for="abilityType">Ability Type *</label>
+          <select 
+            id="abilityType" 
+            name="abilityType" 
+            [(ngModel)]="newParticipant.abilityTypeID" 
+            required
+            class="form-control">
+            <option value="0">Select Ability Type</option>
+            <option *ngFor="let type of abilityTypes" [value]="type.abilityTypeID">
+              {{ type.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="organization">Organization *</label>
+          <select 
+            id="organization" 
+            name="organization" 
+            [(ngModel)]="newParticipant.organizationID" 
+            required
+            class="form-control">
+            <option value="0">Select Organization</option>
+            <option *ngFor="let org of organizations" [value]="org.organizationID">
+              {{ org.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="contact">Contact</label>
+          <input 
+            type="text" 
+            id="contact" 
+            name="contact" 
+            [(ngModel)]="newParticipant.contact"
+            class="form-control"
+            placeholder="Enter contact">
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="!participantForm.form.valid">
+          Register User
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Bulk Upload Form -->
+  <div class="bulk-upload-card" *ngIf="showBulkUpload">
+    <div class="form-header">
+      <h2>📤 Bulk User Registration</h2>
+      <button class="close-btn" (click)="closeForm()">✕</button>
+    </div>
+
+    <div class="upload-section">
+      <!-- Step 1: Download Template -->
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h3>Download Template</h3>
+          <p>First, download the Excel template and fill in the user details.</p>
+          <button type="button" class="btn btn-info" (click)="downloadTemplate()">
+            <span class="btn-icon">📥</span>
+            Download Excel Template
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: Upload File -->
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h3>Upload Filled Template</h3>
+          <p>Select the filled Excel file to upload.</p>
+          <div class="file-input-wrapper">
+            <input 
+              type="file" 
+              (change)="onFileSelected($event)" 
+              accept=".xlsx,.xls"
+              class="file-input"
+              id="fileInput">
+            <label for="fileInput" class="file-input-label">
+              <span class="btn-icon">📁</span>
+              {{ selectedFile ? selectedFile.name : 'Choose Excel File' }}
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Preview & Confirm -->
+      <div class="step-card" *ngIf="bulkParticipants.length > 0">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h3>Preview & Confirm</h3>
+          
+          <!-- Summary -->
+          <div class="upload-summary">
+            <div class="summary-item valid">
+              <span class="summary-label">Valid Users:</span>
+              <span class="summary-value">{{ validParticipantsCount }}</span>
+            </div>
+            <div class="summary-item invalid" *ngIf="invalidParticipantsCount > 0">
+              <span class="summary-label">Invalid Users:</span>
+              <span class="summary-value">{{ invalidParticipantsCount }}</span>
+            </div>
+          </div>
+
+          <!-- Errors -->
+          <div class="error-list" *ngIf="uploadErrors.length > 0">
+            <h4>⚠️ Errors Found:</h4>
+            <ul>
+              <li *ngFor="let error of uploadErrors" class="error-item">{{ error }}</li>
+            </ul>
+          </div>
+
+          <!-- Preview Table -->
+          <div class="preview-table-container">
+            <table class="preview-table">
+              <thead>
+                <tr>
+                  <th>Row</th>
+                  <th>Name</th>
+                  <th>Age</th>
+                  <th>Ability Type</th>
+                  <th>Organization</th>
+                  <th>Contact</th>
+                  <th>Game 1</th>
+                  <th>Game 2</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let user of bulkParticipants; let i = index" 
+                    [class.invalid-row]="!user.isValid">
+                  <td>{{ user.rowNumber }}</td>
+                  <td>{{ user.name }}</td>
+                  <td>{{ user.age }}</td>
+                  <td>{{ user.abilityTypeName }}</td>
+                  <td>{{ user.organizationName }}</td>
+                  <td>{{ user.contact || '-' }}</td>
+                  <td>
+                    <span *ngIf="user.game1Name" class="game-badge" [title]="user.game1Code">
+                      {{ user.game1Name }}
+                      <small class="game-code">({{ user.game1Code }})</small>
+                    </span>
+                    <span *ngIf="!user.game1Name" class="text-muted">-</span>
+                  </td>
+                  <td>
+                    <span *ngIf="user.game2Name" class="game-badge" [title]="user.game2Code">
+                      {{ user.game2Name }}
+                      <small class="game-code">({{ user.game2Code }})</small>
+                    </span>
+                    <span *ngIf="!user.game2Name" class="text-muted">-</span>
+                  </td>
+                  <td>
+                    <span class="status-badge" [class.valid]="user.isValid" [class.invalid]="!user.isValid">
+                      {{ user.isValid ? '✓ Valid' : '✗ Invalid' }}
+                    </span>
+                  </td>
+                  <td>
+                    <button type="button" class="btn-icon-only btn-danger" (click)="removeBulkParticipant(i)" title="Remove">
+                      🗑️
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
+            <button 
+              type="button" 
+              class="btn btn-success" 
+              (click)="confirmBulkUpload()"
+              [disabled]="validParticipantsCount === 0 || isProcessing">
+              <span *ngIf="!isProcessing">Register {{ validParticipantsCount }} Users</span>
+              <span *ngIf="isProcessing">Processing...</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Welcome Message when no action selected -->
+  <div class="welcome-message" *ngIf="!showForm && !showBulkUpload">
+    <div class="welcome-icon">🎓</div>
+    <h2>Welcome to Student Registration</h2>
+    <p>Choose an option above to register students individually or in bulk.</p>
+    
+    <div class="info-cards">
+      <div class="info-card">
+        <div class="info-icon">➕</div>
+        <h3>Single Registration</h3>
+        <p>Add one student at a time using the form</p>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">📤</div>
+        <h3>Bulk Upload</h3>
+        <p>Upload multiple students using Excel</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,125 @@
+<div class="allocations-container">
+  <div class="header">
+    <h1>Ground Allocation Schedule</h1>
+    <button class="btn btn-primary" (click)="openAddForm()">
+      <span class="icon">+</span> Schedule Ground
+    </button>
+  </div>
+
+  <!-- Allocations List -->
+  <div class="table-container" *ngIf="!showForm">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Ground</th>
+          <th>Activity</th>
+          <th>Start Time</th>
+          <th>End Time</th>
+          <th>Duration</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let allocation of allocations" [class.upcoming]="isUpcoming(allocation.startTime)">
+          <td>{{ allocation.groundAllocationID }}</td>
+          <td>{{ getGroundName(allocation.groundID) }}</td>
+          <td>{{ getActivityName(allocation.activityID) }}</td>
+          <td>{{ formatDateTime(allocation.startTime) }}</td>
+          <td>{{ formatDateTime(allocation.endTime) }}</td>
+          <td>{{ getDuration(allocation.startTime, allocation.endTime) }}</td>
+          <td>
+            <span class="status-badge" [class.status-upcoming]="isUpcoming(allocation.startTime)" 
+                  [class.status-past]="!isUpcoming(allocation.startTime)">
+              {{ isUpcoming(allocation.startTime) ? 'Upcoming' : 'Past' }}
+            </span>
+          </td>
+          <td class="actions">
+            <button class="btn btn-edit" (click)="openEditForm(allocation)">Edit</button>
+            <button class="btn btn-delete" (click)="deleteAllocation(allocation.groundAllocationID)">Delete</button>
+          </td>
+        </tr>
+        <tr *ngIf="allocations.length === 0">
+          <td colspan="8" class="no-data">No ground allocations found. Click "Schedule Ground" to create one.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Allocation Form -->
+  <div class="form-container" *ngIf="showForm">
+    <div class="form-header">
+      <h2>{{ isEditing ? 'Edit Ground Allocation' : 'Schedule New Ground' }}</h2>
+      <button class="btn btn-close" (click)="closeForm()">✕</button>
+    </div>
+    
+    <form (ngSubmit)="saveAllocation()" #allocationForm="ngForm">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="ground">Ground *</label>
+          <select 
+            id="ground" 
+            [(ngModel)]="newAllocation.groundID" 
+            name="ground" 
+            required
+          >
+            <option value="0" disabled>Select a ground</option>
+            <option *ngFor="let ground of grounds" [value]="ground.groundID">
+              {{ ground.name }} - {{ ground.location }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="activity">Activity *</label>
+          <select 
+            id="activity" 
+            [(ngModel)]="newAllocation.activityID" 
+            name="activity" 
+            required
+          >
+            <option value="0" disabled>Select an activity</option>
+            <option *ngFor="let activity of activities" [value]="activity.activityID">
+              {{ activity.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="startTime">Start Time *</label>
+          <input 
+            type="datetime-local" 
+            id="startTime" 
+            [(ngModel)]="newAllocation.startTime" 
+            name="startTime" 
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="endTime">End Time *</label>
+          <input 
+            type="datetime-local" 
+            id="endTime" 
+            [(ngModel)]="newAllocation.endTime" 
+            name="endTime" 
+            required
+          />
+        </div>
+      </div>
+
+      <div class="info-box">
+        <strong>Note:</strong> The system will prevent double-booking of grounds. 
+        Make sure the selected time slot doesn't conflict with existing allocations.
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="!allocationForm.valid">
+          {{ isEditing ? 'Update' : 'Schedule' }} Allocation
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

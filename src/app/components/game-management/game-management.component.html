@@ -1,0 +1,184 @@
+<div class="game-management-container">
+  <div class="page-header">
+    <h1>Game Management & Assignment</h1>
+    <p class="subtitle">View games organized by disability type, age category, and game codes</p>
+    <button class="btn btn-participation" (click)="navigateToParticipation()">📊 View Participation Statistics</button>
+  </div>
+
+  <!-- Game Code Search Section -->
+  <div class="search-section card">
+    <h2>Search by Game Code</h2>
+    <div class="search-form">
+      <div class="form-group">
+        <label for="gameCode">Enter Game Code (e.g., 1A02):</label>
+        <div class="search-input-group">
+          <input 
+            type="text" 
+            id="gameCode" 
+            [(ngModel)]="searchGameCode" 
+            placeholder="1A02"
+            maxlength="4"
+            class="form-control"
+            (keyup.enter)="searchByGameCode()"
+          />
+          <button (click)="searchByGameCode()" class="btn btn-primary">Search</button>
+          <button (click)="clearSearch()" class="btn btn-secondary" *ngIf="searchGameCode">Clear</button>
+        </div>
+      </div>
+
+      <div class="search-result" *ngIf="searchResult">
+        <div class="alert alert-success">
+          <h3>{{ searchResult.name }}</h3>
+          <div class="game-details">
+            <div class="detail-row">
+              <span class="label">Game Code:</span>
+              <span class="value badge badge-primary">{{ searchResult.gameCode }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Disability Type:</span>
+              <span class="value">{{ searchResult.abilityType?.name }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Age Category:</span>
+              <span class="value">{{ searchResult.ageCategory }} ({{ searchResult.ageRangeStart }}-{{ searchResult.ageRangeEnd }} years)</span>
+            </div>
+            <div class="detail-row" *ngIf="searchResult.description">
+              <span class="label">Description:</span>
+              <span class="value">{{ searchResult.description }}</span>
+            </div>
+            <div class="detail-row" *ngIf="searchResult.rules">
+              <span class="label">Rules:</span>
+              <span class="value">{{ searchResult.rules }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-danger" *ngIf="searchError">
+        {{ searchError }}
+      </div>
+    </div>
+
+    <!-- Game Code Legend -->
+    <div class="legend-section">
+      <h3>Game Code Format: [Disability][Age][Game]</h3>
+      <div class="legend-grid">
+        <div class="legend-column">
+          <h4>Disability Codes:</h4>
+          <ul>
+            <li><strong>1</strong> - Physically challenged by leg</li>
+            <li><strong>2</strong> - Physically challenged by Hand</li>
+            <li><strong>3</strong> - Intellectually challenged</li>
+            <li><strong>4</strong> - DEAF AND DUMB</li>
+            <li><strong>5</strong> - VISUALLY IMPAIRED</li>
+            <li><strong>6</strong> - LEARNING DISABILITY</li>
+          </ul>
+        </div>
+        <div class="legend-column">
+          <h4>Age Categories:</h4>
+          <ul>
+            <li><strong>A</strong> - 8 to 12 years</li>
+            <li><strong>B</strong> - 13 to 17 years</li>
+            <li><strong>C</strong> - 18 to 22 years</li>
+            <li><strong>D</strong> - 23 to 27 years</li>
+          </ul>
+        </div>
+        <div class="legend-column">
+          <h4>Game Codes:</h4>
+          <ul>
+            <li><strong>01</strong> - Archery</li>
+            <li><strong>02</strong> - Bocce</li>
+            <li><strong>03</strong> - Carrom</li>
+            <li><strong>04</strong> - Goal The Ball</li>
+            <li><strong>05</strong> - Shotput</li>
+            <li><strong>06</strong> - 50m Race</li>
+            <li><strong>07</strong> - 100m Race</li>
+            <li><strong>08</strong> - 200m Race</li>
+          </ul>
+        </div>
+      </div>
+      <div class="example">
+        <strong>Example:</strong> Code <span class="badge badge-info">1A02</span> = 
+        Physically challenged by leg (1) + Age 8-12 (A) + Bocce (02)
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Section -->
+  <div class="filter-section card">
+    <h2>Filter by Disability Type</h2>
+    <div class="filter-buttons">
+      <button 
+        (click)="filterByDisabilityType(null)" 
+        [class.active]="selectedDisabilityType === null"
+        class="btn filter-btn"
+      >
+        All Types
+      </button>
+      <button 
+        *ngFor="let disability of disabilityTypes"
+        (click)="filterByDisabilityType(disability.code)" 
+        [class.active]="selectedDisabilityType === disability.code"
+        class="btn filter-btn"
+      >
+        {{ disability.code }}. {{ disability.name }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading games...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+    <button (click)="loadGames()" class="btn btn-primary btn-sm">Retry</button>
+  </div>
+
+  <!-- Games Display -->
+  <div *ngIf="!loading && !error" class="games-container">
+    <div *ngFor="let disabilityGroup of getFilteredGames()" class="disability-group card">
+      <div class="disability-header">
+        <h2>
+          <span class="disability-code">{{ disabilityGroup.disabilityTypeCode }}</span>
+          {{ disabilityGroup.disabilityTypeName }}
+        </h2>
+      </div>
+
+      <div class="age-categories">
+        <div *ngFor="let ageGroup of disabilityGroup.games" class="age-category-section">
+          <div class="age-header">
+            <h3>
+              Age Category: <span class="badge badge-secondary">{{ ageGroup.ageCategory }}</span>
+              <span class="age-range">({{ ageGroup.ageRange }} years)</span>
+            </h3>
+          </div>
+
+          <div class="games-grid">
+            <div *ngFor="let game of ageGroup.games" class="game-card">
+              <div class="game-code-badge">
+                {{ game.gameCode }}
+              </div>
+              <h4>{{ game.name }}</h4>
+              <p class="game-description" *ngIf="game.description">{{ game.description }}</p>
+              <div class="game-code-breakdown">
+                <small>{{ decodeGameCode(game.gameCode) }}</small>
+              </div>
+              <div class="game-rules" *ngIf="game.rules">
+                <strong>Rules:</strong> {{ game.rules }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="getFilteredGames().length === 0" class="empty-state">
+      <p>No games found for the selected criteria.</p>
+    </div>
+  </div>
+</div>

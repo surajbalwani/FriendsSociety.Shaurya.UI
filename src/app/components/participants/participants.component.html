@@ -1,0 +1,475 @@
+<div class="participants-container">
+  <div class="header">
+    <h1>🏃 Participant Management</h1>
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="openBulkUploadForm()">
+        <span class="icon">📤</span> Bulk Upload
+      </button>
+      <button class="btn btn-primary" (click)="openAddForm()">
+        <span class="icon">+</span> Add New Participant
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section" *ngIf="!showForm && !showBulkUpload">
+    <div class="filters-header">
+      <h3>🔍 Filter Participants</h3>
+      <button class="btn btn-clear" (click)="clearAllFilters()" *ngIf="hasActiveFilters">
+        <span class="icon">✕</span> Clear Filters
+      </button>
+    </div>
+    
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label for="ageGroup">
+          <span class="filter-icon">🎂</span>
+          Age Group
+        </label>
+        <select 
+          id="ageGroup" 
+          [(ngModel)]="selectedAgeGroup" 
+          (ngModelChange)="onAgeGroupChange()"
+          class="filter-select">
+          <option value="all">All Ages</option>
+          <option *ngFor="let group of ageGroups.slice(1)" [value]="group.label">
+            {{ group.label }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="gender">
+          <span class="filter-icon">👤</span>
+          Gender
+        </label>
+        <select 
+          id="gender" 
+          [(ngModel)]="selectedGender" 
+          (ngModelChange)="onGenderChange()"
+          class="filter-select">
+          <option *ngFor="let gender of genderOptions" [value]="gender.toLowerCase()">
+            {{ gender }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="organization">
+          <span class="filter-icon">🏢</span>
+          School/Organization
+        </label>
+        <select 
+          id="organization" 
+          [(ngModel)]="selectedOrganization" 
+          (ngModelChange)="onOrganizationChange()"
+          class="filter-select">
+          <option [value]="0">All Organizations</option>
+          <option *ngFor="let org of organizations" [value]="org.organizationID">
+            {{ org.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="abilityType">
+          <span class="filter-icon">♿</span>
+          Ability Type
+        </label>
+        <select 
+          id="abilityType" 
+          [(ngModel)]="selectedAbilityType" 
+          (ngModelChange)="onAbilityTypeChange()"
+          class="filter-select">
+          <option [value]="0">All Ability Types</option>
+          <option *ngFor="let type of abilityTypes" [value]="type.abilityTypeID">
+            {{ type.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Participant List Table -->
+  <div class="table-container" *ngIf="!showForm && !showBulkUpload">
+    <div class="table-info">
+      <span class="results-count">
+        Showing <strong>{{ filteredParticipants.length }}</strong> participants
+      </span>
+    </div>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Age</th>
+          <th>Gender</th>
+          <th>Blood Group</th>
+          <th>Ability Type</th>
+          <th>Organization</th>
+          <th>Contact</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let participant of filteredParticipants">
+          <td>{{ participant.participantID }}</td>
+          <td>{{ participant.name }}</td>
+          <td>{{ participant.age }}</td>
+          <td>{{ participant.gender || 'N/A' }}</td>
+          <td>{{ participant.bloodGroup || 'N/A' }}</td>
+          <td>{{ participant.abilityTypeName }}</td>
+          <td>{{ participant.organizationName }}</td>
+          <td>{{ participant.contact || 'N/A' }}</td>
+          <td class="actions">
+            <button class="btn btn-edit" (click)="openEditForm(participant)">Edit</button>
+            <button class="btn btn-delete" (click)="deleteParticipant(participant.participantID)">Delete</button>
+          </td>
+        </tr>
+        <tr *ngIf="filteredParticipants.length === 0">
+          <td colspan="9" class="no-data">
+            <div class="no-data-content">
+              <span class="no-data-icon">🔍</span>
+              <p>No participants found</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Single Participant Form -->
+  <div class="form-container" *ngIf="showForm">
+    <div class="form-header">
+      <h2>{{ isEditing ? 'Edit Participant' : 'Add New Participant' }}</h2>
+      <button class="btn btn-close" (click)="closeForm()">✕</button>
+    </div>
+    
+    <form (ngSubmit)="saveParticipant()" #participantForm="ngForm">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="name">Name *</label>
+          <input 
+            type="text" 
+            id="name" 
+            [(ngModel)]="newParticipant.name" 
+            name="name" 
+            required
+            placeholder="Enter participant name"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="age">Age *</label>
+          <input 
+            type="number" 
+            id="age" 
+            [(ngModel)]="newParticipant.age" 
+            name="age" 
+            (ngModelChange)="onAgeOrAbilityChange()"
+            required
+            min="1"
+            placeholder="Enter age"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="gender">Gender</label>
+          <select 
+            id="gender" 
+            [(ngModel)]="newParticipant.gender" 
+            name="gender"
+          >
+            <option value="">Select gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="bloodGroup">Blood Group</label>
+          <select 
+            id="bloodGroup" 
+            [(ngModel)]="newParticipant.bloodGroup" 
+            name="bloodGroup"
+          >
+            <option value="">Select blood group</option>
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+            <option value="O+">O+</option>
+            <option value="O-">O-</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="abilityType">Ability Type *</label>
+          <select 
+            id="abilityType" 
+            [(ngModel)]="newParticipant.abilityTypeID" 
+            name="abilityType" 
+            (ngModelChange)="onAgeOrAbilityChange()"
+            required
+          >
+            <option value="0" disabled>Select ability type</option>
+            <option *ngFor="let abilityType of abilityTypes" [value]="abilityType.abilityTypeID">
+              {{ abilityType.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="organization">Organization *</label>
+          <select 
+            id="organization" 
+            [(ngModel)]="newParticipant.organizationID" 
+            name="organization" 
+            required
+          >
+            <option value="0" disabled>Select organization</option>
+            <option *ngFor="let org of organizations" [value]="org.organizationID">
+              {{ org.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Games Selection Section -->
+        <div class="form-section-divider full-width">
+          <h3>🎮 Game Selection</h3>
+          <p class="section-note">Select games based on age (8-27 years) and ability type</p>
+        </div>
+
+        <div class="form-group">
+          <label for="game1">🎮 Game 1 * (Required)</label>
+          <select 
+            id="game1" 
+            [(ngModel)]="selectedGame1" 
+            name="game1"
+            (ngModelChange)="onGame1Change()"
+            required
+            [disabled]="availableGames.length === 0"
+          >
+            <option [value]="null" disabled>{{ availableGames.length > 0 ? 'Select first game' : 'Enter age & ability type first' }}</option>
+            <option *ngFor="let game of availableGames" [value]="game.gameID">
+              {{ game.gameCode }} - {{ game.name }} (Age: {{ game.ageRangeStart }}-{{ game.ageRangeEnd }})
+            </option>
+          </select>
+          <small class="field-help" *ngIf="availableGames.length === 0 && newParticipant.age && newParticipant.abilityTypeID">
+            ⚠️ Age must be between 8-27 years for game participation
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="game2">🎮 Game 2 (Optional)</label>
+          <select 
+            id="game2" 
+            [(ngModel)]="selectedGame2" 
+            name="game2"
+            (ngModelChange)="onGame2Change()"
+            [disabled]="!selectedGame1 || availableGames.length === 0"
+          >
+            <option [value]="null">{{ selectedGame1 ? 'Select second game (optional)' : 'Select Game 1 first' }}</option>
+            <option *ngFor="let game of getAvailableGamesForGame2()" [value]="game.gameID">
+              {{ game.gameCode }} - {{ game.name }} (Age: {{ game.ageRangeStart }}-{{ game.ageRangeEnd }})
+            </option>
+          </select>
+          <small class="field-help">💡 Optional: You can select a second game if you wish</small>
+        </div>
+
+        <div class="form-group">
+          <label for="contact">Contact</label>
+          <input 
+            type="text" 
+            id="contact" 
+            [(ngModel)]="newParticipant.contact" 
+            name="contact"
+            placeholder="Enter contact number"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="emergencyContact">Emergency Contact</label>
+          <input 
+            type="text" 
+            id="emergencyContact" 
+            [(ngModel)]="newParticipant.emergencyContact" 
+            name="emergencyContact"
+            placeholder="Enter emergency contact"
+          />
+        </div>
+
+        <div class="form-group full-width">
+          <label for="address">Address</label>
+          <textarea 
+            id="address" 
+            [(ngModel)]="newParticipant.address" 
+            name="address"
+            rows="2"
+            placeholder="Enter address"
+          ></textarea>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="medicalNotes">Medical Notes</label>
+          <textarea 
+            id="medicalNotes" 
+            [(ngModel)]="newParticipant.medicalNotes" 
+            name="medicalNotes"
+            rows="2"
+            placeholder="Enter any medical notes, allergies, etc."
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="!participantForm.valid">
+          {{ isEditing ? 'Update' : 'Create' }} Participant
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Bulk Upload Form -->
+  <div class="bulk-upload-container" *ngIf="showBulkUpload">
+    <div class="form-header">
+      <h2>Bulk Participant Upload</h2>
+      <button class="btn btn-close" (click)="closeForm()">✕</button>
+    </div>
+
+    <div class="upload-instructions">
+      <div class="instruction-card">
+        <h3>📋 Instructions</h3>
+        <ol>
+          <li>Download the Excel template</li>
+          <li>Fill in participant details</li>
+          <li>Upload the completed file</li>
+          <li>Review the preview</li>
+          <li>Click "Confirm Upload"</li>
+        </ol>
+        <button class="btn btn-download" (click)="downloadTemplate()">
+          <span class="icon">⬇️</span> Download Template
+        </button>
+      </div>
+
+      <div class="instruction-card">
+        <h3>⚠️ Important Notes</h3>
+        <ul>
+          <li>AbilityType and Organization names must match exactly</li>
+          <li>Name, Age, AbilityType, and Organization are required</li>
+          <li>Age must be a positive number</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="upload-section">
+      <div class="file-upload">
+        <input 
+          type="file" 
+          id="excelFile" 
+          accept=".xlsx,.xls" 
+          (change)="onFileSelected($event)"
+        />
+        <label for="excelFile" class="upload-label">
+          <span class="upload-icon">📁</span>
+          <span class="upload-text">
+            {{ selectedFile ? selectedFile.name : 'Click to select Excel file' }}
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <div class="error-summary" *ngIf="uploadErrors.length > 0">
+      <h3>⚠️ Errors Found ({{ uploadErrors.length }})</h3>
+      <div class="error-list">
+        <div *ngFor="let error of uploadErrors" class="error-item">{{ error }}</div>
+      </div>
+    </div>
+
+    <div class="preview-section" *ngIf="bulkParticipants.length > 0">
+      <div class="preview-header">
+        <h3>Preview Participants ({{ bulkParticipants.length }} total)</h3>
+        <div class="preview-stats">
+          <span class="stat-valid">✓ Valid: {{ validParticipantsCount }}</span>
+          <span class="stat-invalid" *ngIf="invalidParticipantsCount > 0">✗ Invalid: {{ invalidParticipantsCount }}</span>
+        </div>
+      </div>
+
+      <div class="preview-table-container">
+        <table class="preview-table">
+          <thead>
+            <tr>
+              <th>Row</th>
+              <th>Name</th>
+              <th>Age</th>
+              <th>Gender</th>
+              <th>Blood Group</th>
+              <th>Ability Type</th>
+              <th>Organization</th>
+              <th>Contact</th>
+              <th>Game 1</th>
+              <th>Game 2</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let participant of bulkParticipants; let i = index" [class.invalid-row]="!participant.isValid">
+              <td>{{ participant.rowNumber }}</td>
+              <td>{{ participant.name }}</td>
+              <td>{{ participant.age }}</td>
+              <td>{{ participant.gender || 'N/A' }}</td>
+              <td>{{ participant.bloodGroup || 'N/A' }}</td>
+              <td>{{ participant.abilityTypeName }}</td>
+              <td>{{ participant.organizationName }}</td>
+              <td>{{ participant.contact || 'N/A' }}</td>
+              <td>
+                <span *ngIf="participant.game1Name" class="game-badge">
+                  {{ participant.game1Name }}
+                  <small class="game-code">({{ participant.game1Code }})</small>
+                </span>
+                <span *ngIf="!participant.game1Name" class="text-muted">-</span>
+              </td>
+              <td>
+                <span *ngIf="participant.game2Name" class="game-badge">
+                  {{ participant.game2Name }}
+                  <small class="game-code">({{ participant.game2Code }})</small>
+                </span>
+                <span *ngIf="!participant.game2Name" class="text-muted">-</span>
+              </td>
+              <td>
+                <span class="status-badge" [class.badge-valid]="participant.isValid" [class.badge-invalid]="!participant.isValid">
+                  {{ participant.isValid ? '✓ Valid' : '✗ Invalid' }}
+                </span>
+                <div class="row-errors" *ngIf="!participant.isValid">
+                  <small *ngFor="let error of participant.errors">• {{ error }}</small>
+                </div>
+              </td>
+              <td>
+                <button class="btn btn-remove" (click)="removeBulkParticipant(i)">Remove</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="preview-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
+        <button 
+          type="button" 
+          class="btn btn-success" 
+          (click)="confirmBulkUpload()"
+          [disabled]="validParticipantsCount === 0 || isProcessing"
+        >
+          <span *ngIf="!isProcessing">✓ Confirm Upload ({{ validParticipantsCount }} participants)</span>
+          <span *ngIf="isProcessing">⏳ Processing...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

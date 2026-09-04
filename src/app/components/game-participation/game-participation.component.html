@@ -1,0 +1,108 @@
+<div class="participation-container">
+  <div class="page-header">
+    <button class="back-btn" (click)="goBack()">
+      <span>←</span> Back to Games
+    </button>
+    <h1>Game Participation Statistics</h1>
+    <p class="subtitle">View participant counts for all games</p>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-section" *ngIf="!loading && !error">
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange()"
+        placeholder="Search by game name, code, disability type, or age category..."
+        class="search-input"
+      />
+      <button 
+        *ngIf="searchTerm" 
+        (click)="clearSearch()" 
+        class="clear-btn"
+        title="Clear search"
+      >
+        ✕
+      </button>
+    </div>
+    <p class="search-results-info" *ngIf="searchTerm">
+      Found <strong>{{ filteredParticipationData.length }}</strong> disability categories matching "{{ searchTerm }}"
+    </p>
+  </div>
+
+  <!-- Summary Card -->
+  <div class="summary-card" *ngIf="!loading && !error">
+    <div class="summary-stat">
+      <h2>{{totalParticipants}}</h2>
+      <p>Total Participants</p>
+    </div>
+    <div class="summary-stat">
+      <h2>{{participationData.length}}</h2>
+      <p>Disability Categories</p>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading participation data...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+    <button (click)="loadParticipation()" class="btn btn-primary btn-sm">Retry</button>
+  </div>
+
+  <!-- Participation Data -->
+  <div *ngIf="!loading && !error" class="participation-content">
+    <div *ngFor="let disabilityGroup of filteredParticipationData" class="disability-group card">
+      <div class="disability-header">
+        <h2>
+          <span class="disability-code">{{ disabilityGroup.disabilityTypeCode }}</span>
+          {{ disabilityGroup.disabilityTypeName }}
+        </h2>
+        <div class="group-stats">
+          <span class="stat-badge">{{ disabilityGroup.totalParticipants }} {{ getParticipantLabel(disabilityGroup.totalParticipants) }}</span>
+        </div>
+      </div>
+
+      <div class="games-grid">
+        <div *ngFor="let game of disabilityGroup.games" 
+             class="game-card"
+             [class.has-participants]="game.participantCount > 0"
+             [class.no-participants]="game.participantCount === 0">
+          <div class="game-header">
+            <div class="game-code-badge">{{ game.gameCode }}</div>
+            <div class="participant-count" [class.zero]="game.participantCount === 0">
+              {{ game.participantCount }}
+            </div>
+          </div>
+          <h3>{{ game.name }}</h3>
+          <div class="game-info">
+            <span class="age-badge">Age {{ game.ageRange }}</span>
+            <span class="category-badge">Category {{ game.ageCategory }}</span>
+          </div>
+          <div class="participant-label">
+            {{ game.participantCount }} {{ getParticipantLabel(game.participantCount) }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State for No Participants -->
+      <div *ngIf="disabilityGroup.totalParticipants === 0" class="empty-state-small">
+        <p>No participants registered for any games in this category yet.</p>
+      </div>
+    </div>
+
+    <!-- Overall Empty State -->
+    <div *ngIf="filteredParticipationData.length === 0" class="empty-state">
+      <span class="empty-icon">🔍</span>
+      <p *ngIf="searchTerm">No games found matching "{{ searchTerm }}"</p>
+      <p *ngIf="!searchTerm">No participation data available yet.</p>
+      <button *ngIf="searchTerm" (click)="clearSearch()" class="btn btn-primary">Clear Search</button>
+    </div>
+  </div>
+</div>

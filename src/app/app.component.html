@@ -1,0 +1,135 @@
+<div class="app-container" *ngIf="isAuthenticated">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar" [class.collapsed]="!isSidebarOpen">
+    <div class="sidebar-header">
+      <h2 *ngIf="isSidebarOpen">Shaurya</h2>
+      <h2 *ngIf="!isSidebarOpen">S</h2>
+      <p class="role-badge" *ngIf="isSidebarOpen && currentUser">
+        {{ currentUser.role | titlecase }}
+      </p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <!-- Dashboard - Admin and Volunteer only -->
+      <a *ngIf="!isSchoolTeacher" routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">📊</span>
+        <span class="nav-text" *ngIf="isSidebarOpen">Dashboard</span>
+      </a>
+
+      <!-- Ground Allocations - Admin and Volunteer only -->
+      <a *ngIf="!isSchoolTeacher" routerLink="/ground-allocations" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">📅</span>
+        <span class="nav-text" *ngIf="isSidebarOpen">Ground Allocations</span>
+      </a>
+
+      <!-- Games Management - All authenticated users -->
+      <a routerLink="/games" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">🎮</span>
+        <span class="nav-text" *ngIf="isSidebarOpen">Games Management</span>
+      </a>
+
+      <!-- Registration - SchoolTeacher only -->
+      <a *ngIf="isSchoolTeacher" routerLink="/registration" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">🎓</span>
+        <span class="nav-text" *ngIf="isSidebarOpen">Registration</span>
+      </a>
+
+      <!-- Admin-only menu items -->
+      <ng-container *ngIf="isAdmin">
+        <div class="nav-divider" *ngIf="isSidebarOpen">
+          <span>Admin Only</span>
+        </div>
+
+        <a routerLink="/duty" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">👔</span>
+          <span class="nav-text" *ngIf="isSidebarOpen">Duty</span>
+        </a>
+
+        <a routerLink="/users" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">👤</span>
+          <span class="nav-text" *ngIf="isSidebarOpen">Users</span>
+        </a>
+
+        <a routerLink="/volunteers" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">👥</span>
+          <span class="nav-text" *ngIf="isSidebarOpen">Volunteers</span>
+        </a>
+
+        <a routerLink="/participants" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">🏃</span>
+          <span class="nav-text" *ngIf="isSidebarOpen">Participants</span>
+        </a>
+
+        <a routerLink="/roles" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">🎭</span>
+          <span class="nav-text" *ngIf="isSidebarOpen">Roles</span>
+        </a>
+
+        <a routerLink="/organizations" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">🏢</span>
+          <span class="nav-text" *ngIf="isSidebarOpen">Organizations</span>
+        </a>
+
+        <a routerLink="/ability-types" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">♿</span>
+          <span class="nav-text" *ngIf="isSidebarOpen">Ability Types</span>
+        </a>
+
+        <a routerLink="/activities" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">🏃</span>
+          <span class="nav-text" *ngIf="isSidebarOpen">Activities</span>
+        </a>
+
+        <a routerLink="/activity-categories" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">📋</span>
+          <span class="nav-text" *ngIf="isSidebarOpen">Activity Categories</span>
+        </a>
+
+        <a routerLink="/grounds" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">🏟️</span>
+          <span class="nav-text" *ngIf="isSidebarOpen">Grounds</span>
+        </a>
+      </ng-container>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn" (click)="logout()">
+        <span class="nav-icon">🚪</span>
+        <span class="nav-text" *ngIf="isSidebarOpen">Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <div class="main-content" [class.expanded]="!isSidebarOpen">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="toggle-btn" (click)="toggleSidebar()">
+          {{ isSidebarOpen ? '◀' : '▶' }}
+        </button>
+        <h1>{{ title }}</h1>
+      </div>
+      <div class="header-right" *ngIf="currentUser">
+        <span class="user-info">
+          <span class="user-icon">👤</span>
+          <span class="username">{{ currentUser.username }}</span>
+          <span class="user-role" 
+                [class.admin]="isAdmin" 
+                [class.volunteer]="isVolunteer"
+                [class.schoolteacher]="isSchoolTeacher">
+            {{ currentUser.role }}
+          </span>
+        </span>
+      </div>
+    </header>
+
+    <!-- Router Outlet -->
+    <main class="content-area">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>
+
+<!-- Show only router outlet for login page -->
+<router-outlet *ngIf="!isAuthenticated"></router-outlet>

@@ -1,0 +1,80 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="logo">🎯</div>
+      <h1>Shaurya</h1>
+      <p class="subtitle">Activity Management System</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input
+          type="text"
+          id="username"
+          [(ngModel)]="username"
+          name="username"
+          required
+          placeholder="Enter username"
+          autocomplete="username"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          [(ngModel)]="password"
+          name="password"
+          required
+          placeholder="Enter password"
+          autocomplete="current-password"
+        />
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">
+        <span class="error-icon">⚠️</span>
+        {{ errorMessage }}
+      </div>
+
+      <button
+        type="submit"
+        class="login-button"
+        [disabled]="!loginForm.valid"
+      >
+        Login
+      </button>
+    </form>
+
+    <div class="login-info">
+      <p class="info-text">💡 Demo Credentials:</p>
+      
+      <div class="credentials-grid">
+        <div class="credential-card admin">
+          <div class="card-header">
+            <span class="role-icon">👨‍💼</span>
+            <span class="role-name">Admin</span>
+          </div>
+          <div class="card-body">
+            <p><strong>Username:</strong> utsavpal</p>
+            <p><strong>Password:</strong> utsav123</p>
+            <p class="access-note">✓ Full Access</p>
+          </div>
+        </div>
+
+        <div class="credential-card volunteer">
+          <div class="card-header">
+            <span class="role-icon">🤝</span>
+            <span class="role-name">Volunteer</span>
+          </div>
+          <div class="card-body">
+            <p><strong>Username:</strong> amansharma</p>
+            <p><strong>Password:</strong> aman123</p>
+            <p class="access-note">✓ Ground Allocations Only</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

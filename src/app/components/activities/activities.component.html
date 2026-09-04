@@ -1,0 +1,76 @@
+<div class="activities-container">
+  <div class="header">
+    <h1>Activity Management</h1>
+    <button class="btn btn-primary" (click)="openAddForm()">
+      <span class="icon">+</span> Add New Activity
+    </button>
+  </div>
+
+  <!-- Activity List -->
+  <div class="table-container" *ngIf="!showForm">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Activity Name</th>
+          <th>Rules</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let activity of activities">
+          <td>{{ activity.activityID }}</td>
+          <td>{{ activity.name }}</td>
+          <td>{{ activity.rules || 'No rules specified' }}</td>
+          <td class="actions">
+            <button class="btn btn-edit" (click)="openEditForm(activity)">Edit</button>
+            <button class="btn btn-delete" (click)="deleteActivity(activity.activityID)">Delete</button>
+          </td>
+        </tr>
+        <tr *ngIf="activities.length === 0">
+          <td colspan="4" class="no-data">No activities found. Click "Add New Activity" to create one.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Activity Form -->
+  <div class="form-container" *ngIf="showForm">
+    <div class="form-header">
+      <h2>{{ isEditing ? 'Edit Activity' : 'Add New Activity' }}</h2>
+      <button class="btn btn-close" (click)="closeForm()">✕</button>
+    </div>
+    
+    <form (ngSubmit)="saveActivity()" #activityForm="ngForm">
+      <div class="form-group">
+        <label for="name">Activity Name *</label>
+        <input 
+          type="text" 
+          id="name" 
+          [(ngModel)]="newActivity.name" 
+          name="name" 
+          required
+          placeholder="e.g., Cricket, Swimming, Chess"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="rules">Rules & Guidelines</label>
+        <textarea 
+          id="rules" 
+          [(ngModel)]="newActivity.rules" 
+          name="rules"
+          rows="6"
+          placeholder="Enter activity rules, guidelines, or special instructions..."
+        ></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="!activityForm.valid">
+          {{ isEditing ? 'Update' : 'Create' }} Activity
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

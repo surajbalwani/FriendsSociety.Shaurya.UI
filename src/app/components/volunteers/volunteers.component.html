@@ -1,0 +1,184 @@
+<div class="volunteers-container">
+  <div class="page-header">
+    <h1>👥 Volunteer Management</h1>
+    <p>Manage volunteers who help coordinate activities</p>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="action-buttons" *ngIf="!showForm">
+    <button class="btn btn-primary" (click)="openAddForm()">
+      <span class="btn-icon">➕</span>
+      Add New Volunteer
+    </button>
+  </div>
+
+  <!-- Volunteers Table -->
+  <div class="table-card" *ngIf="!showForm">
+    <div class="table-header">
+      <h2>📋 All Volunteers</h2>
+      <span class="count-badge">{{ volunteers.length }} volunteers</span>
+    </div>
+
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Blood Group</th>
+            <th>Contact</th>
+            <th>WhatsApp</th>
+            <th>Email</th>
+            <th>Address</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let volunteer of volunteers">
+            <td>{{ volunteer.volunteerID }}</td>
+            <td><strong>{{ volunteer.name }}</strong></td>
+            <td>{{ volunteer.age }}</td>
+            <td>
+              <span class="blood-badge" *ngIf="volunteer.bloodGroup">{{ volunteer.bloodGroup }}</span>
+              <span *ngIf="!volunteer.bloodGroup">-</span>
+            </td>
+            <td>{{ volunteer.contact || '-' }}</td>
+            <td>{{ volunteer.whatsAppNo || '-' }}</td>
+            <td>{{ volunteer.email || '-' }}</td>
+            <td class="address-cell">{{ volunteer.address || '-' }}</td>
+            <td class="actions">
+              <button class="btn btn-sm btn-edit" (click)="openEditForm(volunteer)">✏️ Edit</button>
+              <button class="btn btn-sm btn-delete" (click)="deleteVolunteer(volunteer.volunteerID)">🗑️ Delete</button>
+            </td>
+          </tr>
+          <tr *ngIf="volunteers.length === 0">
+            <td colspan="9" class="no-data">
+              <div class="empty-state">
+                <span class="empty-icon">📭</span>
+                <p>No volunteers found. Add your first volunteer!</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Add/Edit Volunteer Form -->
+  <div class="form-card" *ngIf="showForm">
+    <div class="form-header">
+      <h2>{{ isEditing ? '✏️ Edit Volunteer' : '➕ Add New Volunteer' }}</h2>
+      <button class="close-btn" (click)="closeForm()">✕</button>
+    </div>
+
+    <form (ngSubmit)="saveVolunteer()" #volunteerForm="ngForm">
+      <div class="form-grid">
+        <!-- Name -->
+        <div class="form-group">
+          <label for="name">Name *</label>
+          <input 
+            type="text" 
+            id="name" 
+            name="name" 
+            [(ngModel)]="newVolunteer.name" 
+            required
+            class="form-control"
+            placeholder="Enter volunteer name">
+        </div>
+
+        <!-- Age -->
+        <div class="form-group">
+          <label for="age">Age *</label>
+          <input 
+            type="number" 
+            id="age" 
+            name="age" 
+            [(ngModel)]="newVolunteer.age" 
+            required
+            min="18"
+            max="65"
+            class="form-control"
+            placeholder="Enter age">
+        </div>
+
+        <!-- Blood Group -->
+        <div class="form-group">
+          <label for="bloodGroup">Blood Group</label>
+          <select 
+            id="bloodGroup" 
+            name="bloodGroup" 
+            [(ngModel)]="newVolunteer.bloodGroup"
+            class="form-control">
+            <option value="">Select Blood Group</option>
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+            <option value="O+">O+</option>
+            <option value="O-">O-</option>
+          </select>
+        </div>
+
+        <!-- Contact -->
+        <div class="form-group">
+          <label for="contact">Contact Number</label>
+          <input 
+            type="tel" 
+            id="contact" 
+            name="contact" 
+            [(ngModel)]="newVolunteer.contact"
+            class="form-control"
+            placeholder="Enter contact number"
+            pattern="[0-9]{10}">
+        </div>
+
+        <!-- WhatsApp -->
+        <div class="form-group">
+          <label for="whatsapp">WhatsApp Number</label>
+          <input 
+            type="tel" 
+            id="whatsapp" 
+            name="whatsapp" 
+            [(ngModel)]="newVolunteer.whatsAppNo"
+            class="form-control"
+            placeholder="Enter WhatsApp number"
+            pattern="[0-9]{10}">
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            [(ngModel)]="newVolunteer.email"
+            class="form-control"
+            placeholder="Enter email address">
+        </div>
+
+        <!-- Address -->
+        <div class="form-group full-width">
+          <label for="address">Address</label>
+          <textarea 
+            id="address" 
+            name="address" 
+            [(ngModel)]="newVolunteer.address"
+            class="form-control"
+            rows="3"
+            placeholder="Enter complete address"></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="!volunteerForm.form.valid">
+          {{ isEditing ? 'Update Volunteer' : 'Add Volunteer' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

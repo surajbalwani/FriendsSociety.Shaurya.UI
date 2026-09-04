@@ -1,0 +1,251 @@
+<div class="users-container">
+  <div class="header">
+    <h1>👥 User Management</h1>
+    <div class="header-actions">
+      <button class="btn btn-primary" (click)="openAddForm()">
+        <span class="icon">+</span> Add New User
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section" *ngIf="!showForm">
+    <div class="filters-header">
+      <h3>🔍 Filter Users</h3>
+      <button class="btn btn-clear" (click)="clearAllFilters()" *ngIf="hasActiveFilters">
+        <span class="icon">✕</span> Clear Filters
+      </button>
+    </div>
+    
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label for="organization">
+          <span class="filter-icon">🏢</span>
+          School/Organization
+        </label>
+        <select 
+          id="organization" 
+          [(ngModel)]="selectedOrganization" 
+          (ngModelChange)="onOrganizationChange()"
+          class="filter-select">
+          <option [value]="0">All Organizations</option>
+          <option *ngFor="let org of organizations" [value]="org.organizationID">
+            {{ org.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="abilityType">
+          <span class="filter-icon">♿</span>
+          Ability Type
+        </label>
+        <select 
+          id="abilityType" 
+          [(ngModel)]="selectedAbilityType" 
+          (ngModelChange)="onAbilityTypeChange()"
+          class="filter-select">
+          <option [value]="0">All Ability Types</option>
+          <option *ngFor="let type of abilityTypes" [value]="type.abilityTypeID">
+            {{ type.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- User List Table -->
+  <div class="table-container" *ngIf="!showForm">
+    <div class="table-info">
+      <span class="results-count">
+        Showing <strong>{{ filteredUsers.length }}</strong> users
+      </span>
+    </div>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Age</th>
+          <th>Blood Group</th>
+          <th>Ability Type</th>
+          <th>Organization</th>
+          <th>Contact</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of filteredUsers">
+          <td>{{ user.userName }}</td>
+          <td>{{ user.email || 'N/A' }}</td>
+          <td>{{ user.age }}</td>
+          <td>{{ user.bloodGroup || 'N/A' }}</td>
+          <td>{{ user.abilityTypeName }}</td>
+          <td>{{ user.organizationName }}</td>
+          <td>{{ user.contactNo || 'N/A' }}</td>
+          <td class="actions">
+            <button class="btn btn-delete" (click)="deleteUser(user.id)">Delete</button>
+          </td>
+        </tr>
+        <tr *ngIf="filteredUsers.length === 0">
+          <td colspan="8" class="no-data">
+            <div class="no-data-content">
+              <span class="no-data-icon">🔍</span>
+              <p>No users found</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Single User Form -->
+  <div class="form-container" *ngIf="showForm">
+    <div class="form-header">
+      <h2>Add New User</h2>
+      <button class="btn btn-close" (click)="closeForm()">✕</button>
+    </div>
+    
+    <form (ngSubmit)="saveUser()" #userForm="ngForm">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="userName">Username *</label>
+          <input 
+            type="text" 
+            id="userName" 
+            [(ngModel)]="newUser.userName" 
+            name="userName" 
+            required
+            placeholder="Enter username"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input 
+            type="email" 
+            id="email" 
+            [(ngModel)]="newUser.email" 
+            name="email"
+            placeholder="Enter email"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password *</label>
+          <input 
+            type="password" 
+            id="password" 
+            [(ngModel)]="newUser.password" 
+            name="password" 
+            required
+            placeholder="Enter password"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="age">Age *</label>
+          <input 
+            type="number" 
+            id="age" 
+            [(ngModel)]="newUser.age" 
+            name="age" 
+            required
+            min="1"
+            placeholder="Enter age"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="bloodGroup">Blood Group</label>
+          <select 
+            id="bloodGroup" 
+            [(ngModel)]="newUser.bloodGroup" 
+            name="bloodGroup"
+          >
+            <option value="">Select blood group</option>
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+            <option value="O+">O+</option>
+            <option value="O-">O-</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="abilityType">Ability Type *</label>
+          <select 
+            id="abilityType" 
+            [(ngModel)]="newUser.abilityTypeID" 
+            name="abilityType" 
+            required
+          >
+            <option value="0" disabled>Select ability type</option>
+            <option *ngFor="let abilityType of abilityTypes" [value]="abilityType.abilityTypeID">
+              {{ abilityType.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="organization">Organization *</label>
+          <select 
+            id="organization" 
+            [(ngModel)]="newUser.organizationID" 
+            name="organization" 
+            required
+          >
+            <option value="0" disabled>Select organization</option>
+            <option *ngFor="let org of organizations" [value]="org.organizationID">
+              {{ org.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="contactNo">Contact</label>
+          <input 
+            type="text" 
+            id="contactNo" 
+            [(ngModel)]="newUser.contactNo" 
+            name="contactNo"
+            placeholder="Enter contact number"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="whatsappNumber">WhatsApp Number</label>
+          <input 
+            type="text" 
+            id="whatsappNumber" 
+            [(ngModel)]="newUser.whatsappNumber" 
+            name="whatsappNumber"
+            placeholder="Enter WhatsApp number"
+          />
+        </div>
+
+        <div class="form-group full-width">
+          <label for="address">Address</label>
+          <textarea 
+            id="address" 
+            [(ngModel)]="newUser.address" 
+            name="address"
+            rows="2"
+            placeholder="Enter address"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="!userForm.valid">
+          Create User
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

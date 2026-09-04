@@ -1,0 +1,28 @@
+@import '../participants/participants.component.scss';
+
+.volunteers-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.blood-badge {
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.address-cell {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
