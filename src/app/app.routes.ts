@@ -4,6 +4,7 @@ import { AdministrationComponent } from './administration/administration.compone
 import { MembersComponent } from './components/members/members.component';
 import { EventsComponent } from './components/events/events.component';
 import { ContactComponent } from './components/contact/contact.component';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -12,8 +13,22 @@ export const routes: Routes = [
   { path: 'events', component: EventsComponent },
   { path: 'contact', component: ContactComponent },
   {
+    path: 'auth',
+    children: [
+      {
+        path: 'login',
+        loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent)
+      },
+      {
+        path: 'register',
+        loadComponent: () => import('./auth/register/register.component').then(m => m.RegisterComponent)
+      }
+    ]
+  },
+  {
     path: 'administration',
     component: AdministrationComponent,
+    canActivate: [authGuard],
     children: [
       {
         path: 'users',

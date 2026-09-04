@@ -21,10 +21,20 @@
           <span>Contact</span>
           <mat-icon>mail</mat-icon>
         </a></li>
-        <li><a routerLink="/administration" routerLinkActive="active">
+        <li *ngIf="isLoggedIn"><a routerLink="/administration" routerLinkActive="active">
           <span>Administration</span>
           <mat-icon>settings</mat-icon>
         </a></li>
+        <li *ngIf="!isLoggedIn"><a routerLink="/auth/login" routerLinkActive="active">
+          <span>Login</span>
+          <mat-icon>login</mat-icon>
+        </a></li>
+        <li *ngIf="isLoggedIn">
+          <a (click)="logout()" style="cursor: pointer">
+            <span>Logout</span>
+            <mat-icon>logout</mat-icon>
+          </a>
+        </li>
       </ul>
     </div>
   </div>

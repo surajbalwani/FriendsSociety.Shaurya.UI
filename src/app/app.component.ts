@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -16,6 +17,23 @@ import { MatIconModule } from '@angular/material/icon';
     MatIconModule
   ]
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'FriendsSociety.Sharya.UI';
+  isLoggedIn = false;
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  ngOnInit() {
+    this.authService.currentUser$.subscribe(user => {
+      this.isLoggedIn = !!user;
+    });
+  }
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/auth/login']);
+  }
 }
